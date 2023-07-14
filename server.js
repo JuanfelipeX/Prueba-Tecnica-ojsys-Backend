@@ -14,6 +14,7 @@ app.use((req, res, next) => {
 
 const userRouter = require('./routes/user.js');
 const frutaRouter = require('./routes/fruta.js');
+const pedioRouter = require('./routes/pedido.js');
 
 app.use('/user', userRouter);
 app.use('/fruta', frutaRouter);
@@ -28,7 +29,11 @@ userRouter.post('/login', (req, res) => {
 });
 
 frutaRouter.get('/', (req, res) => {
-  // Lógica para obtener la lista de usuarios
+  // Lógica para obtener la lista de fruta
+});
+
+pedioRouter.get('/', (req, res) => {
+  // Lógica para obtener la lista de pedido
 });
 
 const pool = new Pool({

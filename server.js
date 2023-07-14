@@ -18,6 +18,7 @@ const pedioRouter = require('./routes/pedido.js');
 
 app.use('/user', userRouter);
 app.use('/fruta', frutaRouter);
+app.use('/pedido', pedioRouter);
 
 userRouter.get('/', (req, res) => {
   // Lógica para obtener la lista de usuarios

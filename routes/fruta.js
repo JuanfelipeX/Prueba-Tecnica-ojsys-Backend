@@ -4,19 +4,38 @@ const bcrypt = require('bcrypt');
 const Fruta = require('../models/fruta.js');
 const { generateToken, verifyToken, comparePassword } = require('../routes/auth.js');
 
-
-// Obtener la lista completa de frutas
+// Obtener la lista completa de frutas paginada
 router.get('/', (req, res) => {
-    Fruta.findAll()
-    .then((fruta) => {
-      res.json(fruta);
+  const { size, page } = req.body;
+  const pageSize = parseInt(size, 10) || 10; // Tamaño de la página (10 por defecto)
+  const currentPage = parseInt(page, 10) || 1; // Página actual (1 por defecto)
+
+  const offset = (currentPage - 1) * pageSize;
+
+  Fruta.findAndCountAll({
+    limit: pageSize,
+    offset: offset,
+  })
+    .then((result) => {
+      const frutas = result.rows;
+      const totalCount = result.count;
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      res.json({
+        frutas,
+        totalCount,
+        totalPages,
+        currentPage,
+        pageSize,
+      });
     })
     .catch((error) => {
       res.status(500).json({ error: 'Error al obtener la lista de frutas' });
     });
 });
 
-// Crear un nuevo frutas
+
+// Crear una nueva fruta
 router.post('/', (req, res) => {
   const { tipo, cantidad, precio } = req.body;
 
@@ -29,8 +48,7 @@ router.post('/', (req, res) => {
     });
 });
 
-
-// Obtener los detalles de una fruta específico
+// Obtener los detalles de una fruta específica
 router.get('/:id', (req, res) => {
   const frutaId = req.params.id;
 
@@ -39,15 +57,15 @@ router.get('/:id', (req, res) => {
       if (fruta) {
         res.json(fruta);
       } else {
-        res.status(404).json({ error: 'Fruta no encontrado' });
+        res.status(404).json({ error: 'Fruta no encontrada' });
       }
     })
     .catch((error) => {
-      res.status(500).json({ error: 'Error al obtener los detalles de fruta' });
+      res.status(500).json({ error: 'Error al obtener los detalles de la fruta' });
     });
 });
 
-// Actualizar los detalles de un usuario específico
+// Actualizar los detalles de una fruta específica
 router.put('/:id', (req, res) => {
   const frutaId = req.params.id;
   const { tipo, cantidad, precio } = req.body;
@@ -67,11 +85,11 @@ router.put('/:id', (req, res) => {
       res.json(updatedFruta);
     })
     .catch((error) => {
-      res.status(500).json({ error: 'Error al actualizar los detalles de la Fruta' });
+      res.status(500).json({ error: 'Error al actualizar los detalles de la fruta' });
     });
 });
 
-// Eliminar un usuario específico
+// Eliminar una fruta específica
 router.delete('/:id', (req, res) => {
   const frutaId = req.params.id;
 
@@ -80,14 +98,14 @@ router.delete('/:id', (req, res) => {
       if (fruta) {
         return fruta.destroy();
       } else {
-        res.status(404).json({ error: 'Fruta no encontrado' });
+        res.status(404).json({ error: 'Fruta no encontrada' });
       }
     })
     .then(() => {
       res.json({ message: 'Fruta eliminada correctamente' });
     })
     .catch((error) => {
-      res.status(500).json({ error: 'Error al eliminar el Fruta' });
+      res.status(500).json({ error: 'Error al eliminar la fruta' });
     });
 });
 
